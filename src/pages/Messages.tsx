@@ -4,7 +4,7 @@ import { auth, db } from '@/src/firebase';
 import { collection, query, where, onSnapshot, addDoc, orderBy, doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { ChatThread, Message } from '@/src/types';
-import { Send, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Send, User, ArrowRight, Loader2, MessageCircle } from 'lucide-react';
 
 export const Messages: React.FC = () => {
   const [user] = useAuthState(auth);
@@ -226,5 +226,3 @@ export const Messages: React.FC = () => {
     </div>
   );
 };
-
-import { MessageCircle } from 'lucide-react';
