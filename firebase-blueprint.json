@@ -1,7 +1,7 @@
 {
   "entities": {
-    "User": {
-      "title": "User",
+    "UserProfile": {
+      "title": "UserProfile",
       "description": "User profile information",
       "type": "object",
       "properties": {
@@ -10,28 +10,31 @@
         "lastName": { "type": "string" },
         "wilaya": { "type": "string" },
         "phone": { "type": "string" },
-        "email": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
         "photoURL": { "type": "string" },
         "role": { "type": "string", "enum": ["user", "admin"] },
         "rating": { "type": "number" },
         "ratingCount": { "type": "number" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["uid", "firstName", "lastName", "email"]
+      "required": ["uid", "firstName", "lastName", "wilaya", "phone", "email", "role", "createdAt"]
     },
-    "Car": {
-      "title": "Car",
-      "description": "Car listing details",
+    "CarListing": {
+      "title": "CarListing",
+      "description": "Car advertisement listing",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
         "description": { "type": "string" },
         "price": { "type": "number" },
+        "bidPrice": { "type": "number" },
         "condition": { "type": "string", "enum": ["excellent", "good", "average", "below_average"] },
         "year": { "type": "number" },
         "mileage": { "type": "number" },
         "engine": { "type": "string", "enum": ["Diesel", "Essence"] },
         "gearbox": { "type": "string", "enum": ["Manuelle", "Automatique"] },
+        "engineState": { "type": "string", "enum": ["heats", "consumes", "consumes_little", "perfect"] },
+        "bodyState": { "type": "string" },
         "replacedParts": { "type": "string" },
         "brand": { "type": "string" },
         "model": { "type": "string" },
@@ -40,37 +43,40 @@
         "sellerId": { "type": "string" },
         "sellerName": { "type": "string" },
         "sellerPhone": { "type": "string" },
+        "showPhone": { "type": "boolean" },
         "isVerified": { "type": "boolean" },
         "status": { "type": "string", "enum": ["active", "sold"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "price", "brand", "model", "sellerId"]
+      "required": ["title", "description", "price", "condition", "year", "engine", "gearbox", "engineState", "bodyState", "brand", "model", "wilaya", "images", "sellerId", "sellerName", "sellerPhone", "showPhone", "isVerified", "status", "createdAt"]
     },
-    "Chat": {
-      "title": "Chat",
-      "description": "Messaging thread between buyer and seller",
+    "ChatThread": {
+      "title": "ChatThread",
+      "description": "A conversation between two users about a car",
       "type": "object",
       "properties": {
         "participants": { "type": "array", "items": { "type": "string" } },
         "carId": { "type": "string" },
         "lastMessage": { "type": "string" },
         "updatedAt": { "type": "string", "format": "date-time" }
-      }
+      },
+      "required": ["participants", "carId", "lastMessage", "updatedAt"]
     },
     "Message": {
       "title": "Message",
-      "description": "Individual message in a chat",
+      "description": "A single message in a chat thread",
       "type": "object",
       "properties": {
         "chatId": { "type": "string" },
         "senderId": { "type": "string" },
         "text": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
-      }
+      },
+      "required": ["chatId", "senderId", "text", "createdAt"]
     },
     "Comment": {
       "title": "Comment",
-      "description": "Comment on a car listing",
+      "description": "A comment on a car listing",
       "type": "object",
       "properties": {
         "carId": { "type": "string" },
@@ -78,14 +84,30 @@
         "userName": { "type": "string" },
         "text": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
-      }
+      },
+      "required": ["carId", "userId", "userName", "text", "createdAt"]
     }
   },
   "firestore": {
-    "/users/{userId}": { "schema": "User", "description": "User profiles" },
-    "/cars/{carId}": { "schema": "Car", "description": "Car listings" },
-    "/chats/{chatId}": { "schema": "Chat", "description": "Chat threads" },
-    "/chats/{chatId}/messages/{messageId}": { "schema": "Message", "description": "Messages within a chat" },
-    "/comments/{commentId}": { "schema": "Comment", "description": "Comments on cars" }
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents"
+    },
+    "/cars/{carId}": {
+      "schema": "CarListing",
+      "description": "Car listing documents"
+    },
+    "/chats/{chatId}": {
+      "schema": "ChatThread",
+      "description": "Chat thread documents"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages within a chat thread"
+    },
+    "/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Comments on car listings"
+    }
   }
 }
