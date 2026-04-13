@@ -13,6 +13,7 @@ export const Messages: React.FC = () => {
   
   const carId = searchParams.get('carId');
   const sellerId = searchParams.get('sellerId');
+  const initialMessage = searchParams.get('message');
 
   const [chats, setChats] = useState<ChatThread[]>([]);
   const [activeChat, setActiveChat] = useState<ChatThread | null>(null);
@@ -64,6 +65,11 @@ export const Messages: React.FC = () => {
       const existingChat = chats.find(c => c.carId === carId && c.participants.includes(sellerId));
       if (existingChat) {
         setActiveChat(existingChat);
+        if (initialMessage) {
+          // Send initial message if it doesn't exist in the last few messages
+          // This is a simplified check
+          setNewMessage(initialMessage);
+        }
         return;
       }
 
@@ -76,17 +82,30 @@ export const Messages: React.FC = () => {
         await setDoc(chatRef, {
           participants: [user.uid, sellerId],
           carId,
-          lastMessage: '',
+          lastMessage: initialMessage || '',
           updatedAt: new Date().toISOString()
         });
+
+        if (initialMessage) {
+          await addDoc(collection(db, `chats/${chatId}/messages`), {
+            chatId,
+            senderId: user.uid,
+            text: initialMessage,
+            createdAt: new Date().toISOString()
+          });
+        }
       }
       
-      const newChat = { id: chatId, participants: [user.uid, sellerId], carId, lastMessage: '', updatedAt: new Date().toISOString() };
+      const newChat = { id: chatId, participants: [user.uid, sellerId], carId, lastMessage: initialMessage || '', updatedAt: new Date().toISOString() };
       setActiveChat(newChat);
+      if (initialMessage) {
+        // Clear message param from URL to prevent re-sending on refresh
+        navigate('/messages', { replace: true });
+      }
     };
 
     if (!loading) initChat();
-  }, [user, carId, sellerId, loading, chats]);
+  }, [user, carId, sellerId, loading, chats, initialMessage]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();

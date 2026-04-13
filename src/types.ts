@@ -17,11 +17,14 @@ export interface CarListing {
   title: string;
   description: string;
   price: number;
+  bidPrice?: number; // ساموني
   condition: 'excellent' | 'good' | 'average' | 'below_average';
   year: number;
   mileage?: number;
   engine: 'Diesel' | 'Essence';
   gearbox: 'Manuelle' | 'Automatique';
+  engineState: 'heats' | 'consumes' | 'consumes_little' | 'perfect'; // يسخن، ينقص، ينقص شوي، ما ينقص
+  bodyState: string; // معاودة، فوال، بروتال، إلخ
   replacedParts?: string;
   brand: string;
   model: string;
@@ -30,6 +33,7 @@ export interface CarListing {
   sellerId: string;
   sellerName: string;
   sellerPhone: string;
+  showPhone: boolean; // خيار إظهار الهاتف
   isVerified: boolean;
   status: 'active' | 'sold';
   createdAt: string;

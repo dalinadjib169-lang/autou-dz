@@ -30,7 +30,7 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link to="/search" className="text-slate-600 hover:text-dz-green font-medium transition-colors">
+            <Link to="/search" className="text-slate-600 hover:text-dz-green font-bold transition-colors">
               تصفح السيارات
             </Link>
             
@@ -48,9 +48,11 @@ export const Navbar: React.FC = () => {
                 </Link>
                 <button 
                   onClick={handleLogout}
-                  className="p-2 text-slate-600 hover:bg-red-50 hover:text-dz-red rounded-full transition-colors"
+                  className="flex items-center gap-2 bg-dz-red/10 text-dz-red px-3 py-2 rounded-lg hover:bg-dz-red hover:text-white transition-all font-bold text-sm"
+                  title="تسجيل الخروج"
                 >
-                  <LogOut size={20} />
+                  <LogOut size={18} />
+                  <span className="hidden lg:inline">خروج</span>
                 </button>
               </>
             ) : (

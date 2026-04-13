@@ -16,6 +16,9 @@ export const Search: React.FC = () => {
   const [selectedWilaya, setSelectedWilaya] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [minYear, setMinYear] = useState('');
+  const [maxYear, setMaxYear] = useState('');
+  const [maxMileage, setMaxMileage] = useState('');
   const [selectedCondition, setSelectedCondition] = useState('');
 
   useEffect(() => {
@@ -59,18 +62,33 @@ export const Search: React.FC = () => {
       result = result.filter(car => car.price <= Number(maxPrice));
     }
 
+    if (minYear) {
+      result = result.filter(car => car.year >= Number(minYear));
+    }
+
+    if (maxYear) {
+      result = result.filter(car => car.year <= Number(maxYear));
+    }
+
+    if (maxMileage) {
+      result = result.filter(car => (car.mileage || 0) <= Number(maxMileage));
+    }
+
     if (selectedCondition) {
       result = result.filter(car => car.condition === selectedCondition);
     }
 
     setFilteredCars(result);
-  }, [searchTerm, selectedWilaya, minPrice, maxPrice, selectedCondition, cars]);
+  }, [searchTerm, selectedWilaya, minPrice, maxPrice, minYear, maxYear, maxMileage, selectedCondition, cars]);
 
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedWilaya('');
     setMinPrice('');
     setMaxPrice('');
+    setMinYear('');
+    setMaxYear('');
+    setMaxMileage('');
     setSelectedCondition('');
   };
 
@@ -136,6 +154,34 @@ export const Search: React.FC = () => {
                     onChange={e => setMaxPrice(e.target.value)}
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">سنة الصنع</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input 
+                    type="number" placeholder="من"
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-dz-green text-sm"
+                    value={minYear}
+                    onChange={e => setMinYear(e.target.value)}
+                  />
+                  <input 
+                    type="number" placeholder="إلى"
+                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-dz-green text-sm"
+                    value={maxYear}
+                    onChange={e => setMaxYear(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">المسافة القصوى (كم)</label>
+                <input 
+                  type="number" placeholder="مثال: 100000"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-dz-green text-sm"
+                  value={maxMileage}
+                  onChange={e => setMaxMileage(e.target.value)}
+                />
               </div>
 
               <div>

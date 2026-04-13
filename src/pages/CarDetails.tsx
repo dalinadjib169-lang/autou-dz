@@ -58,7 +58,7 @@ export const CarDetails: React.FC = () => {
     }
   };
 
-  const startChat = async () => {
+  const startChat = async (initialMessage?: string) => {
     if (!user) {
       navigate('/login');
       return;
@@ -66,7 +66,15 @@ export const CarDetails: React.FC = () => {
     if (!car || car.sellerId === user.uid) return;
 
     // Simplified chat start: just navigate to messages with car info
-    navigate(`/messages?carId=${car.id}&sellerId=${car.sellerId}`);
+    navigate(`/messages?carId=${car.id}&sellerId=${car.sellerId}${initialMessage ? `&message=${encodeURIComponent(initialMessage)}` : ''}`);
+  };
+
+  const handleGetPhone = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    startChat('السلام عليكم، لقد طلبت رقم هاتفك بخصوص إعلان السيارة.');
   };
 
   if (loading) return <div className="max-w-7xl mx-auto px-4 py-20 text-center">جاري التحميل...</div>;
@@ -118,22 +126,34 @@ export const CarDetails: React.FC = () => {
 
           {/* Description */}
           <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-            <h1 className="text-3xl font-black text-slate-900 mb-4">{car.title}</h1>
-            <div className="flex items-center gap-6 mb-8 text-slate-500">
-              <div className="flex items-center gap-2">
-                <MapPin size={18} className="text-dz-green" />
-                <span className="font-medium">{car.wilaya}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar size={18} className="text-dz-green" />
-                <span className="font-medium">{car.year}</span>
-              </div>
-              {car.mileage && (
-                <div className="flex items-center gap-2">
-                  <Gauge size={18} className="text-dz-green" />
-                  <span className="font-medium">{car.mileage.toLocaleString()} كم</span>
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h1 className="text-3xl font-black text-slate-900 mb-2">{car.title}</h1>
+                <div className="flex items-center gap-6 text-slate-500">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={18} className="text-dz-green" />
+                    <span className="font-medium">{car.wilaya}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar size={18} className="text-dz-green" />
+                    <span className="font-medium">{car.year}</span>
+                  </div>
+                  {car.mileage && (
+                    <div className="flex items-center gap-2">
+                      <Gauge size={18} className="text-dz-green" />
+                      <span className="font-medium">{car.mileage.toLocaleString()} كم</span>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+              <div className="text-left">
+                <div className="text-3xl font-black text-dz-green">{formatPrice(car.price)}</div>
+                {car.bidPrice && (
+                  <div className="text-sm font-bold text-slate-400 mt-1">
+                    ساموني: <span className="text-dz-red">{formatPrice(car.bidPrice)}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="prose prose-slate max-w-none">
@@ -151,8 +171,14 @@ export const CarDetails: React.FC = () => {
                 <span className="font-bold text-slate-900">{car.gearbox}</span>
               </div>
               <div>
-                <span className="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">الحالة</span>
-                <span className="font-bold text-slate-900">{car.condition === 'excellent' ? 'ممتازة' : 'جيدة'}</span>
+                <span className="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">حالة المحرك</span>
+                <span className="font-bold text-slate-900">
+                  {car.engineState === 'perfect' ? 'ما ينقص' : car.engineState === 'consumes_little' ? 'ينقص شوي' : car.engineState === 'consumes' ? 'ينقص' : 'يسخن'}
+                </span>
+              </div>
+              <div className="col-span-full">
+                <span className="block text-xs text-slate-400 font-bold mb-1 uppercase tracking-wider">حالة الهيكل (المعاودة)</span>
+                <span className="font-bold text-slate-900">{car.bodyState || 'نقية'}</span>
               </div>
               {car.replacedParts && (
                 <div className="col-span-full">
@@ -208,6 +234,11 @@ export const CarDetails: React.FC = () => {
           <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-xl sticky top-24">
             <div className="text-center mb-8">
               <span className="text-4xl font-black text-dz-green block mb-2">{formatPrice(car.price)}</span>
+              {car.bidPrice && (
+                <div className="inline-flex items-center gap-1.5 bg-dz-red/10 text-dz-red px-3 py-1 rounded-full text-xs font-bold mb-2">
+                  <span>ساموني: {formatPrice(car.bidPrice)}</span>
+                </div>
+              )}
               {car.isVerified && (
                 <div className="inline-flex items-center gap-1.5 bg-dz-green/10 text-dz-green px-3 py-1 rounded-full text-xs font-bold">
                   <ShieldCheck size={14} />
@@ -236,15 +267,25 @@ export const CarDetails: React.FC = () => {
               <p className="text-slate-500 text-xs mb-6">عضو منذ {new Date(car.createdAt).getFullYear()}</p>
               
               <div className="space-y-3">
-                <a 
-                  href={`tel:${car.sellerPhone}`}
-                  className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-lg"
-                >
-                  <Phone size={20} />
-                  <span>إظهار رقم الهاتف</span>
-                </a>
+                {car.showPhone ? (
+                  <a 
+                    href={`tel:${car.sellerPhone}`}
+                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-lg"
+                  >
+                    <Phone size={20} />
+                    <span>{car.sellerPhone}</span>
+                  </a>
+                ) : (
+                  <button 
+                    onClick={handleGetPhone}
+                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-lg"
+                  >
+                    <Phone size={20} />
+                    <span>طلب رقم الهاتف</span>
+                  </button>
+                )}
                 <button 
-                  onClick={startChat}
+                  onClick={() => startChat()}
                   className="w-full bg-white border-2 border-dz-green text-dz-green py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-dz-green/5 transition-all"
                 >
                   <MessageCircle size={20} />
