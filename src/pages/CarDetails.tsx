@@ -4,7 +4,7 @@ import { doc, getDoc, collection, addDoc, query, where, onSnapshot, orderBy } fr
 import { auth, db } from '@/src/firebase';
 import { CarListing, Comment } from '@/src/types';
 import { formatPrice } from '@/src/lib/utils';
-import { MapPin, Calendar, Gauge, ShieldCheck, Phone, MessageCircle, User, Star, Send, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MapPin, Calendar, Gauge, ShieldCheck, Phone, MessageCircle, User, Star, Send, ChevronRight, ChevronLeft, Share2 } from 'lucide-react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const CarDetails: React.FC = () => {
@@ -128,7 +128,27 @@ export const CarDetails: React.FC = () => {
           <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-3xl font-black text-slate-900 mb-2">{car.title}</h1>
+                <div className="flex items-center gap-4 mb-2">
+                  <h1 className="text-3xl font-black text-slate-900">{car.title}</h1>
+                  <button 
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: car.title,
+                          text: car.description,
+                          url: window.location.href
+                        });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('تم نسخ الرابط إلى الحافظة');
+                      }
+                    }}
+                    className="p-2 text-slate-400 hover:text-dz-green hover:bg-slate-50 rounded-xl transition-all"
+                    title="مشاركة"
+                  >
+                    <Share2 size={20} />
+                  </button>
+                </div>
                 <div className="flex items-center gap-6 text-slate-500">
                   <div className="flex items-center gap-2">
                     <MapPin size={18} className="text-dz-green" />

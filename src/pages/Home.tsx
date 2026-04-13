@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, limit, onSnapshot, where } from 'firebase/firestore';
 import { db } from '@/src/firebase';
 import { CarListing } from '@/src/types';
@@ -11,6 +11,9 @@ import { ALGERIA_WILAYAS } from '@/src/lib/utils';
 export const Home: React.FC = () => {
   const [latestCars, setLatestCars] = useState<CarListing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchWilaya, setSearchWilaya] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const q = query(
@@ -28,6 +31,13 @@ export const Home: React.FC = () => {
 
     return () => unsubscribe();
   }, []);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (searchWilaya) params.set('wilaya', searchWilaya);
+    navigate(`/search?${params.toString()}`);
+  };
 
   return (
     <div className="min-h-screen">
@@ -72,16 +82,26 @@ export const Home: React.FC = () => {
                 type="text" 
                 placeholder="ماركة السيارة، الموديل..." 
                 className="w-full outline-none text-slate-700 font-medium"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
             </div>
             <div className="flex-1 flex items-center px-4 py-3">
               <Filter className="text-slate-400 ml-3" size={20} />
-              <select className="w-full outline-none text-slate-700 font-medium bg-transparent">
+              <select 
+                className="w-full outline-none text-slate-700 font-medium bg-transparent"
+                value={searchWilaya}
+                onChange={(e) => setSearchWilaya(e.target.value)}
+              >
                 <option value="">كل الولايات</option>
                 {ALGERIA_WILAYAS.map(w => <option key={w} value={w}>{w}</option>)}
               </select>
             </div>
-            <button className="bg-dz-green text-white px-8 py-4 rounded-xl font-bold hover:bg-dz-green/90 transition-all shadow-lg flex items-center justify-center gap-2">
+            <button 
+              onClick={handleSearch}
+              className="bg-dz-green text-white px-8 py-4 rounded-xl font-bold hover:bg-dz-green/90 transition-all shadow-lg flex items-center justify-center gap-2"
+            >
               <span>ابحث الآن</span>
               <ArrowRight size={20} />
             </button>
