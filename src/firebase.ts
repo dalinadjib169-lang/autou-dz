@@ -12,6 +12,10 @@ const config = {
   firestoreDatabaseId: import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || firebaseConfig.firestoreDatabaseId
 };
 
+const isUsingEnvVars = !!import.meta.env.VITE_FIREBASE_API_KEY;
+console.log("Firebase Config Source:", isUsingEnvVars ? "Vercel Env Vars" : "Local Config File");
+console.log("Active Project ID:", config.projectId);
+
 const app = initializeApp(config);
 console.log("Firebase initialized with Project ID:", config.projectId);
 export const auth = getAuth(app);
