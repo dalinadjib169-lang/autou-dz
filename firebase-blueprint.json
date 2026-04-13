@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "wilaya": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "rating": { "type": "number" },
+        "ratingCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "firstName", "lastName", "email"]
+    },
+    "Car": {
+      "title": "Car",
+      "description": "Car listing details",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "condition": { "type": "string", "enum": ["excellent", "good", "average", "below_average"] },
+        "year": { "type": "number" },
+        "mileage": { "type": "number" },
+        "engine": { "type": "string", "enum": ["Diesel", "Essence"] },
+        "gearbox": { "type": "string", "enum": ["Manuelle", "Automatique"] },
+        "replacedParts": { "type": "string" },
+        "brand": { "type": "string" },
+        "model": { "type": "string" },
+        "wilaya": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "sellerId": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "sellerPhone": { "type": "string" },
+        "isVerified": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["active", "sold"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "price", "brand", "model", "sellerId"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "Messaging thread between buyer and seller",
+      "type": "object",
+      "properties": {
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "carId": { "type": "string" },
+        "lastMessage": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Individual message in a chat",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Comment on a car listing",
+      "type": "object",
+      "properties": {
+        "carId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/cars/{carId}": { "schema": "Car", "description": "Car listings" },
+    "/chats/{chatId}": { "schema": "Chat", "description": "Chat threads" },
+    "/chats/{chatId}/messages/{messageId}": { "schema": "Message", "description": "Messages within a chat" },
+    "/comments/{commentId}": { "schema": "Comment", "description": "Comments on cars" }
+  }
+}
