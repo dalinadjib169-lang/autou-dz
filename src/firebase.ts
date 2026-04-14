@@ -4,23 +4,22 @@ import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 // Use environment variables if available (for Vercel), otherwise fallback to config file
-// We also check for truncated names like VITE_FIREBAS which sometimes happen on mobile setups
+// Note: We prioritize the hardcoded config if environment variables seem incomplete
 const config = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.VITE_FIREBAS || firebaseConfig.apiKey,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId,
   appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
-  firestoreDatabaseId: import.meta.env.VITE_FIREBASE_FIRESTORE_DATABASE_ID || firebaseConfig.firestoreDatabaseId
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig.messagingSenderId
 };
 
-const isUsingEnvVars = !!import.meta.env.VITE_FIREBASE_API_KEY;
-console.log("Firebase Config Source:", isUsingEnvVars ? "Vercel Env Vars" : "Local Config File");
-console.log("Active Project ID:", config.projectId);
+console.log("Firebase attempting to connect to:", config.projectId);
 
 const app = initializeApp(config);
-console.log("Firebase initialized with Project ID:", config.projectId);
 export const auth = getAuth(app);
-export const db = getFirestore(app, config.firestoreDatabaseId);
+// Use the default database if no specific ID is provided
+export const db = getFirestore(app);
 
 // Test connection
 async function testConnection() {
